@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.huangrui.hr_smms.mapper.WarehouseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.huangrui.hr_smms.entity.Warehouse">
+        <id column="id" property="id" />
+        <result column="shop_id" property="shopId" />
+        <result column="product_id" property="productId" />
+        <result column="statistical_time" property="statisticalTime" />
+        <result column="inventory" property="inventory" />
+        <result column="sales" property="sales" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+    <select id="getGoodsSales" resultType="com.huangrui.hr_smms.dos.GoodsSales">
+        SELECT hr_product.id as id ,
+               hr_product.product_name AS goodsName,
+               SUM(hr_warehouse.sales)*hr_product.price as goodsSales
+        FROM hr_warehouse INNER JOIN hr_product
+        WHERE hr_warehouse.product_id = hr_product.id  AND
+                year(from_unixtime(hr_warehouse.statistical_time/1000)) = year(from_unixtime(#{valueMonth}/1000)) AND
+                month(from_unixtime(hr_warehouse.statistical_time/1000)) = month(from_unixtime(#{valueMonth}/1000))
+        GROUP BY
+            product_id
+        ORDER BY goodsSales DESC
+    </select>
+    <select id="getProvinceSales" resultType="com.huangrui.hr_smms.dos.ProvinceSales">
+        SELECT  hr_shop.shop_address_province as province,
+                SUM(hr_warehouse.sales)*hr_product.price as sales
+        from hr_warehouse
+            INNER JOIN hr_shop,hr_product
+        WHERE hr_warehouse.shop_id = hr_shop.id
+          and hr_warehouse.product_id = hr_product.id
+           and year(from_unixtime(hr_warehouse.statistical_time/1000)) = year(from_unixtime(#{valueMonth}/1000)) AND
+                month(from_unixtime(hr_warehouse.statistical_time/1000)) = month(from_unixtime(#{valueMonth}/1000))
+        GROUP BY hr_shop.shop_address_province ORDER BY sales DESC
+    </select>
+    <select id="getWareHouseByShopId" resultType="com.huangrui.hr_smms.entity.Warehouse">
+        select * from hr_warehouse where shop_id = #{shopId}
+                                     AND
+                year(from_unixtime(hr_warehouse.statistical_time/1000)) = year(from_unixtime(#{valueMonth}/1000))
+                                     AND
+                month(from_unixtime(hr_warehouse.statistical_time/1000)) = month(from_unixtime(#{valueMonth}/1000))
+    </select>
+    <select id="getProductIdLongs" resultType="java.lang.Long">
+        select product_id from hr_warehouse where shop_id = #{shopId}
+                                     AND
+                year(from_unixtime(hr_warehouse.statistical_time/1000)) = year(from_unixtime(#{valueMonth}/1000))
+                                     AND
+                month(from_unixtime(hr_warehouse.statistical_time/1000)) = month(from_unixtime(#{valueMonth}/1000))
+    </select>
+    <select id="selectByProductId" resultType="com.huangrui.hr_smms.entity.Warehouse">
+        select * from hr_warehouse where product_id = #{productId}
+                                     AND
+                                       shop_id = #{shopId}
+                                     AND
+                year(from_unixtime(hr_warehouse.statistical_time/1000)) = year(from_unixtime(#{currentTimeMillis}/1000))
+                                     AND
+                month(from_unixtime(hr_warehouse.statistical_time/1000)) = month(from_unixtime(#{currentTimeMillis}/1000))
+    </select>
+
+
+</mapper>
