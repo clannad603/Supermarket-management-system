@@ -1,0 +1,40 @@
+server:
+  port: 8080
+spring:
+  cache:
+    type: redis
+    redis:
+      cache-null-values: true
+  mvc:
+    path match:
+      matching-strategy: ant_path_matcher
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: hr_smms
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/hr_ssms?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: root
+    password: clannadhr01
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: localhost
+    port: 6379
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 2MB
+mybatis-plus:
+  typeAliasesPackage: com.huangrui.dao.pojo
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+    call-setters-on-nulls: true
+  global-config:
+    db-config:
+      table-prefix: ms_
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+qiniu:
+  accessKey: 5vuyEckXagwc3PiBr6-kUEIWiDQHLXCew4-l7EmS
+  accessSecretKey: NY8jrr-1GzryaFi4sUZaEJPdVihYTBPNlGr-jJDs
